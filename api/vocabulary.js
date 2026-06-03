@@ -6,11 +6,53 @@ const pool = new Pool({
 
 export default async function handler(req, res) {
   try {
-    const result = await pool.query(
-      "SELECT * FROM vocabulary ORDER BY created_at DESC"
-    );
+    // GET ALL WORDS
+    if (req.method === "GET") {
+      const result = await pool.query(
+        "SELECT * FROM vocabulary ORDER BY created_at DESC"
+      );
 
-    return res.status(200).json(result.rows);
+      return res.status(200).json(result.rows);
+    }
+
+    // ADD NEW WORD
+    if (req.method === "POST") {
+      const {
+        id,
+        word,
+        hindi_meaning,
+        mnemonic,
+        example,
+        category,
+        difficulty,
+        status,
+      } = req.body;
+
+      await pool.query(
+        `INSERT INTO vocabulary
+        (id, word, hindi_meaning, mnemonic, example, category, difficulty, status)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+        [
+          id,
+          word,
+          hindi_meaning,
+          mnemonic,
+          example,
+          category,
+          difficulty,
+          status,
+        ]
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Word saved successfully",
+      });
+    }
+
+    return res.status(405).json({
+      error: "Method not allowed",
+    });
   } catch (error) {
     return res.status(500).json({
       error: error.message,
