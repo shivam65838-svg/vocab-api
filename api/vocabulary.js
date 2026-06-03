@@ -7,7 +7,7 @@ const pool = new Pool({
 export default async function handler(req, res) {
   // CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") {
@@ -56,6 +56,21 @@ export default async function handler(req, res) {
       return res.status(200).json({
         success: true,
         message: "Word saved successfully",
+      });
+    }
+
+    // UPDATE STATUS
+    if (req.method === "PUT") {
+      const { id, status } = req.body;
+
+      await pool.query(
+        "UPDATE vocabulary SET status = $1 WHERE id = $2",
+        [status, id]
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Status updated successfully",
       });
     }
 
