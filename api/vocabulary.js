@@ -7,7 +7,10 @@ const pool = new Pool({
 export default async function handler(req, res) {
   // CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET,POST,PUT,DELETE,OPTIONS"
+  );
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") {
@@ -74,10 +77,27 @@ export default async function handler(req, res) {
       });
     }
 
+    // DELETE WORD
+    if (req.method === "DELETE") {
+      const { id } = req.body;
+
+      await pool.query(
+        "DELETE FROM vocabulary WHERE id = $1",
+        [id]
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Word deleted successfully",
+      });
+    }
+
     return res.status(405).json({
       error: "Method not allowed",
     });
   } catch (error) {
+    console.error(error);
+
     return res.status(500).json({
       error: error.message,
     });
