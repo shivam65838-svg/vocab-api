@@ -40,16 +40,21 @@ export default async function handler(req, res) {
         status,
       } = req.body;
 
-      const {
-  id,
-  word,
-  hindi_meaning,
-  mnemonic,
-  example,
-  category,
-  difficulty,
-  status,
-} = req.body;
+      const existingWord = await pool.query(
+  `SELECT id
+   FROM vocabulary
+   WHERE LOWER(TRIM(word)) = LOWER(TRIM($1))
+   LIMIT 1`,
+  [word]
+);
+
+if (existingWord.rows.length > 0) {
+  return res.status(409).json({
+    success: false,
+    error: "This word already exists.",
+  });
+}
+
 
       await pool.query(
         `INSERT INTO vocabulary
