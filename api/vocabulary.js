@@ -40,6 +40,17 @@ export default async function handler(req, res) {
         status,
       } = req.body;
 
+      const {
+  id,
+  word,
+  hindi_meaning,
+  mnemonic,
+  example,
+  category,
+  difficulty,
+  status,
+} = req.body;
+
       await pool.query(
         `INSERT INTO vocabulary
         (id, word, hindi_meaning, mnemonic, example, category, difficulty, status)
